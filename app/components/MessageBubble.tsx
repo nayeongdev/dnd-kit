@@ -57,7 +57,7 @@ export default function MessageBubble({
 
   return (
     <div
-      className={`group flex flex-col ${showAvatar ? "mt-4" : "mt-0.5"} ${
+      className={`group flex flex-col  ${
         isMine ? "items-end" : "items-start"
       }`}
       onMouseEnter={() => setShowActions(true)}

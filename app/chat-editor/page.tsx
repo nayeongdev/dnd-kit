@@ -68,6 +68,7 @@ export default function ChatEditorPage() {
   const [users, setUsers] = useState<User[]>(initialUsers);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [currentUserId, setCurrentUserId] = useState<string>("user-1");
+  const [insertIndex, setInsertIndex] = useState<number>(initialMessages.length);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
@@ -88,7 +89,13 @@ export default function ChatEditorPage() {
       timestamp: new Date(),
       edited: false,
     };
-    setMessages((prev) => [...prev, newMessage]);
+    setMessages((prev) => {
+      const next = [...prev];
+      const safeIndex = Math.min(insertIndex, next.length);
+      next.splice(safeIndex, 0, newMessage);
+      return next;
+    });
+    setInsertIndex((prev) => prev + 1);
   };
 
   const handleEditMessage = (id: string, newText: string) => {
@@ -100,7 +107,19 @@ export default function ChatEditorPage() {
   };
 
   const handleDeleteMessage = (id: string) => {
-    setMessages((prev) => prev.filter((msg) => msg.id !== id));
+    setMessages((prev) => {
+      const idx = prev.findIndex((msg) => msg.id === id);
+      const next = prev.filter((msg) => msg.id !== id);
+      // 삭제된 메시지가 insertIndex 이전이면 insertIndex를 1 감소
+      if (idx !== -1 && idx < insertIndex) {
+        setInsertIndex((i) => Math.max(0, i - 1));
+      }
+      // insertIndex가 새 길이를 초과하지 않도록 보정
+      if (insertIndex > next.length) {
+        setInsertIndex(next.length);
+      }
+      return next;
+    });
   };
 
   const handleAddUser = () => {
@@ -200,6 +219,8 @@ export default function ChatEditorPage() {
               messages={messages}
               users={users}
               currentUserId={currentUserId}
+              insertIndex={insertIndex}
+              onInsertIndexChange={setInsertIndex}
               onEditMessage={handleEditMessage}
               onDeleteMessage={handleDeleteMessage}
             />
