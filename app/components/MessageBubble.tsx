@@ -159,7 +159,10 @@ export default function MessageBubble({
 
         {/* 타임스탬프 */}
         {showTimestamp && !isEditing && (
-          <span className="flex-shrink-0 pb-0.5 text-[10px] text-zinc-400 dark:text-zinc-500">
+          <span
+            suppressHydrationWarning
+            className="flex-shrink-0 pb-0.5 text-[10px] text-zinc-400 dark:text-zinc-500"
+          >
             {formatTime(message.timestamp)}
           </span>
         )}
